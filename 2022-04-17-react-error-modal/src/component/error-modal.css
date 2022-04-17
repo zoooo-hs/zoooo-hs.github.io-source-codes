@@ -1,0 +1,14 @@
+.error-modal {
+    width: 500px;
+    height: fit-content;
+    padding: 10px;
+
+    border: 1px solid;
+
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+}
