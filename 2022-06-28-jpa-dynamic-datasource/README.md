@@ -1,4 +1,4 @@
-# JPA 동적 DataSoruce를 Runtime에 적용해보자
+# JPA 동적 DataSource를 Runtime에 적용해보자
 
 [블로그 게시글](https://zoooo-hs.github.io/2022/06/28/JPA-동적-DataSource를-Runtime에-적용해보자.html)
 ## 준비물
