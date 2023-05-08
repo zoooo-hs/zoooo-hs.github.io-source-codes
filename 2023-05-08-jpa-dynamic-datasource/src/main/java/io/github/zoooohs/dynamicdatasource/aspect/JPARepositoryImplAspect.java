@@ -4,11 +4,11 @@ import io.github.zoooohs.dynamicdatasource.datasource.DynamicalJPADatasource;
 import io.github.zoooohs.dynamicdatasource.datasource.JPADynamicDatasourceTransactionManager;
 import io.github.zoooohs.dynamicdatasource.datasource.TransactionManagerConfig;
 import io.github.zoooohs.dynamicdatasource.domain.repository.AbstractJPARepository;
+import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactory;
 import org.springframework.data.util.AnnotatedTypeScanner;
@@ -25,9 +25,9 @@ import java.util.Set;
 
 @Component
 @Aspect
+@RequiredArgsConstructor
 public class JPARepositoryImplAspect {
-    @Autowired
-    private ApplicationContext applicationContext;
+    private final ApplicationContext applicationContext;
 
     @Around("execution(* io.github.zoooohs.dynamicdatasource.domain.repository.AbstractJPARepository+.*(..))")
     public Object repository(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -68,8 +68,8 @@ public class JPARepositoryImplAspect {
         AnnotatedTypeScanner scanner = new AnnotatedTypeScanner(DynamicalJPADatasource.class);
         scanner.setEnvironment(applicationContext.getEnvironment());
         scanner.setResourceLoader(applicationContext);
-        Set<Class<?>> dynamicalDatasourceRepository = scanner.findTypes(new String[]{TransactionManagerConfig.ENTITY_BASE_PACKAGE});
-        AbstractJPARepository dynamicDataSource = (AbstractJPARepository) joinPoint.getTarget();
+        Set<Class<?>> dynamicalDatasourceRepository = scanner.findTypes(TransactionManagerConfig.ENTITY_BASE_PACKAGE);
+        AbstractJPARepository<?> dynamicDataSource = (AbstractJPARepository<?>) joinPoint.getTarget();
         return dynamicalDatasourceRepository.stream().filter(dynamicDataSource::support).findAny().orElseThrow(() -> new RuntimeException("NO SUCH REPOSITORY"));
     }
 }
