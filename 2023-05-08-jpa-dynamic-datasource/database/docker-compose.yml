@@ -1,0 +1,20 @@
+version: '3.1'
+
+# TODO: sql 파일 실행시키기
+services:
+  db-1:
+    image: mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: db-1
+      MYSQL_ROOT_PASSWORD: db-1
+    ports:
+      - 10077:3306
+  db-2:
+    image: mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: db-2
+      MYSQL_ROOT_PASSWORD: db-2
+    ports:
+      - 10078:3306
