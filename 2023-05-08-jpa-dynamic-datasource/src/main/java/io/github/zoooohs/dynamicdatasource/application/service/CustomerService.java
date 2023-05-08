@@ -1,6 +1,7 @@
 package io.github.zoooohs.dynamicdatasource.application.service;
 
 import io.github.zoooohs.dynamicdatasource.application.dto.CustomerSignUp;
+import io.github.zoooohs.dynamicdatasource.datasource.TransactionManagerConfig;
 import io.github.zoooohs.dynamicdatasource.domain.model.Customer;
 import io.github.zoooohs.dynamicdatasource.domain.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,14 +13,20 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomerService {
     private final CustomerRepository customerRepository;
 
-    @Transactional
+    @Transactional(TransactionManagerConfig.DYNAMIC_DATASOURCE_TM_NAME)
     public Customer signUp(CustomerSignUp customerSignUp) {
         Customer newCustomer = customerSignUp.toCustomer();
         return customerRepository.save(newCustomer);
     }
 
+    @Transactional(value = TransactionManagerConfig.DYNAMIC_DATASOURCE_TM_NAME, readOnly = true)
     public Customer findByRnn(String rnn) {
         return customerRepository.findByRnn(rnn)
                 .orElseThrow(() -> new RuntimeException("Customer Not Found!"));
+    }
+
+    @Transactional(TransactionManagerConfig.DYNAMIC_DATASOURCE_TM_NAME)
+    public void deleteAll() {
+        customerRepository.deleteAll();
     }
 }
