@@ -31,4 +31,9 @@ public class CustomerRepositoryImpl extends AbstractJPARepository<CustomerJPARep
     public void deleteAll() {
         repository.deleteAll();
     }
+
+    @Override
+    public Optional<Customer> findById(Integer customerId) {
+        return repository.findById(customerId);
+    }
 }

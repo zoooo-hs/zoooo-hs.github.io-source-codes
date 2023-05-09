@@ -9,6 +9,6 @@ public class CustomerSignIn {
     private String rnn;
 
     public Customer toCustomer() {
-        return new Customer(null, name, rnn);
+        return new Customer(name, rnn);
     }
 }

@@ -29,4 +29,10 @@ public class CustomerService {
     public void deleteAll() {
         customerRepository.deleteAll();
     }
+
+    @Transactional(value = TransactionManagerConfig.DYNAMIC_DATASOURCE_TM_NAME, readOnly = true)
+    public Customer findById(Integer customerId) {
+        return customerRepository.findById(customerId)
+                .orElseThrow(() -> new RuntimeException("Customer Not Found!"));
+    }
 }
