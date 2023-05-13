@@ -24,6 +24,9 @@ public class Account {
     @JoinColumn(name = "CUSTOMER_ID")
     private Customer customer;
 
+    @Column(name = "BLOCKED")
+    private Boolean blocked;
+
     public Account(Customer customer) {
         this.accountNumber = UUID.randomUUID().toString();
         this.balance = 0d;
@@ -46,7 +49,24 @@ public class Account {
         return customer;
     }
 
+    public Boolean isBlocked() {
+        if (this.blocked == null) return false;
+        return this.blocked;
+    }
+
+    public void blockAccount() {
+        this.blocked = true;
+    }
+
+    public void unblockAccount() {
+        this.blocked = false;
+    }
+
     public void withDraw(Double amount) {
+        if (isBlocked()) {
+            throw new RuntimeException("거래 정지된 계좌입니다. " + this.accountNumber);
+        }
+
         if (balance < amount) {
             throw new RuntimeException("가진돈 보다 많이 인출 하려고 함");
         }
@@ -54,6 +74,10 @@ public class Account {
     }
 
     public void deposit(Double amount) {
+        if (isBlocked()) {
+            throw new RuntimeException("거래 정지된 계좌입니다. " + this.accountNumber);
+        }
+
         this.balance += amount;
     }
 
