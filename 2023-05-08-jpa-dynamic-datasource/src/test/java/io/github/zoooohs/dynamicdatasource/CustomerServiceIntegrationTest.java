@@ -65,7 +65,8 @@ class CustomerServiceIntegrationTest {
 		Assertions.assertThat(account.getAccountNumber()).isNotNull();
 		Assertions.assertThat(account.getBalance()).isEqualTo(0);
 
-		// delete all
+		entityManager.clear();
+//		// delete all
 		customerService.deleteAll();
 		jpaDynamicDatasourceTransactionManager.cleanCache();
 		customerService.deleteAll();
