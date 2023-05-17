@@ -2,6 +2,8 @@ package io.github.zoooohs.dynamicdatasource.datasource;
 
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.data.jpa.repository.support.JpaRepositoryFactory;
+import org.springframework.orm.jpa.EntityManagerHolder;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
@@ -15,6 +17,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class JPADynamicDatasourceTransactionManager implements PlatformTransactionManager {
@@ -91,5 +94,23 @@ public class JPADynamicDatasourceTransactionManager implements PlatformTransacti
     @Override
     public void rollback(TransactionStatus status) throws TransactionException {
         currentTransactionManager().rollback(status);
+    }
+
+    public static boolean isCurrentTransactionForDynamicDatasource() {
+        Object currentDynamicDatasourceTransactionManager = TransactionSynchronizationManager.getResource(JPADynamicDatasourceTransactionManager.CURRENT_DYNAMIC_DATASOURCE_JPA_TRANSACTION_MANAGER);
+        return currentDynamicDatasourceTransactionManager != null;
+    }
+
+    public static Object createJpaRepositoryFromCurrentTransactionManager(Class<?> jpaRepositoryClass) {
+        Object currentDynamicDatasourceTransactionManager = TransactionSynchronizationManager.getResource(JPADynamicDatasourceTransactionManager.CURRENT_DYNAMIC_DATASOURCE_JPA_TRANSACTION_MANAGER);
+        return Optional.ofNullable(currentDynamicDatasourceTransactionManager)
+                .map(tm -> (JpaTransactionManager) tm)
+                .map(JpaTransactionManager::getEntityManagerFactory)
+                .map(TransactionSynchronizationManager::getResource)
+                .map(found -> (EntityManagerHolder) found)
+                .map(EntityManagerHolder::getEntityManager)
+                .map(JpaRepositoryFactory::new)
+                .map(factory -> factory.getRepository(jpaRepositoryClass))
+                .orElseThrow(() -> new RuntimeException("No Dynamic Datasource Transaction Manager"));
     }
 }
